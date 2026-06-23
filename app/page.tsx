@@ -33,20 +33,26 @@ export default function LoginPage() {
             RÔLE UTILISATEUR
           </label>
 
-          <div className="grid grid-cols-2 gap-1 mt-2">
-            <button className="bg-[#0b234a] text-white rounded px-3 py-2 text-xs font-bold">
-              Admin
-            </button>
-            <button className="border border-gray-300 rounded px-3 py-2 text-xs font-semibold">
-              RH
-            </button>
-            <button className="border border-gray-300 rounded px-3 py-2 text-xs font-semibold">
-              Direction
-            </button>
-            <button className="border border-gray-300 rounded px-3 py-2 text-xs font-semibold">
-              Lecture seule
-            </button>
-          </div>
+         <div className="grid grid-cols-2 gap-1 mt-2">
+  {["Admin", "RH", "Direction", "Lecture seule"].map((r) => (
+    <button
+      key={r}
+      type="button"
+      onClick={() => setRole(r)}
+      className={`rounded px-3 py-2 text-xs font-bold ${
+        role === r
+          ? "bg-[#0b234a] text-white"
+          : "border border-gray-300 bg-white text-gray-700"
+      }`}
+    >
+      {r}
+    </button>
+  ))}
+</div>
+
+<p className="mt-2 text-xs text-gray-500">
+  Rôle sélectionné : <strong>{role}</strong>
+</p>
         </div>
 
         <div className="mt-5">
