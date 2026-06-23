@@ -6,6 +6,84 @@ export default function RegisterPage() {
   const [role, setRole] = useState("RH");
 const [password, setPassword] = useState("");
 const [confirmPassword, setConfirmPassword] = useState("");
+const departments: Record<string, string[]> = {
+  "Engineering (Bureau d'Études)": [
+    "Process Engineering",
+    "Mechanical Engineering",
+    "Piping Engineering",
+    "Civil & Structural Engineering",
+    "Electrical Engineering",
+    "Instrumentation & Control (E&I)",
+    "HSE Engineering",
+    "Document Control",
+  ],
+  "Project Management": [
+    "Gestion de projets EPC",
+    "Planning",
+    "Cost Control",
+    "Reporting",
+    "Coordination client",
+  ],
+  "Procurement (Achats)": [
+    "Achat matériel",
+    "Sourcing fournisseurs",
+    "Expediting",
+    "Logistique",
+    "Transport international",
+    "Gestion des contrats fournisseurs",
+  ],
+  "Construction": [
+    "Supervision chantier",
+    "Civil Works",
+    "Mechanical Works",
+    "Electrical Works",
+    "Commissioning support",
+  ],
+  "Commissioning & Start-up": [
+    "Précommissioning",
+    "Commissioning",
+    "Démarrage des installations",
+    "Tests de performance",
+  ],
+  "Operations & Maintenance": [
+    "Maintenance préventive",
+    "Maintenance corrective",
+    "Exploitation des installations",
+  ],
+  QHSE: [
+    "Quality Assurance",
+    "Quality Control (QA/QC)",
+    "Health & Safety",
+    "Environment",
+  ],
+  "Business Development & Commercial": [
+    "Développement commercial",
+    "Appels d'offres",
+    "Estimation des coûts",
+    "Relations clients",
+  ],
+  "Finance & Administration": [
+    "Comptabilité",
+    "Contrôle de gestion",
+    "Trésorerie",
+    "Administration",
+  ],
+  "Ressources Humaines": [
+    "Recrutement",
+    "Formation",
+    "Gestion du personnel",
+    "Paie",
+  ],
+  "IT / Systèmes d'information": [
+    "Support informatique",
+    "Réseaux",
+    "Cybersécurité",
+    "ERP et logiciels métiers",
+  ],
+};
+
+const [department, setDepartment] = useState("");
+const [poste, setPoste] = useState("");
   return (
     <main className="min-h-screen bg-[#f6f7f9] flex flex-col items-center px-4 py-8">
       <div className="w-full max-w-[390px]">
@@ -66,9 +144,51 @@ const [confirmPassword, setConfirmPassword] = useState("");
           </div>
 
           <Section title="Informations professionnelles" />
+<div className="mt-3">
+  <label className="text-xs font-semibold text-gray-700">
+    Département / Service
+  </label>
 
-          <Input label="Département / Service" placeholder="Ex: Ressources Humaines" />
-          <Input label="Poste occupé" placeholder="Ex: Responsable Paie" />
+  <select
+    value={department}
+    onChange={(e) => {
+      setDepartment(e.target.value);
+      setPoste("");
+    }}
+    className="mt-1 w-full h-10 border border-gray-300 rounded px-3 text-sm outline-none focus:border-[#0b234a] bg-white"
+  >
+    <option value="">Choisir un département</option>
+    {Object.keys(departments).map((dep) => (
+      <option key={dep} value={dep}>
+        {dep}
+      </option>
+    ))}
+  </select>
+</div>
+
+<div className="mt-3">
+  <label className="text-xs font-semibold text-gray-700">
+    Poste occupé
+  </label>
+
+  <select
+    value={poste}
+    onChange={(e) => setPoste(e.target.value)}
+    disabled={!department}
+    className="mt-1 w-full h-10 border border-gray-300 rounded px-3 text-sm outline-none focus:border-[#0b234a] bg-white disabled:bg-gray-100"
+  >
+    <option value="">
+      {department ? "Choisir un poste" : "Choisir d'abord un département"}
+    </option>
+
+    {department &&
+      departments[department].map((p) => (
+        <option key={p} value={p}>
+          {p}
+        </option>
+      ))}
+  </select>
+</div>
 
           <div className="mt-5 space-y-3 text-xs text-gray-600">
             <label className="flex gap-2">
