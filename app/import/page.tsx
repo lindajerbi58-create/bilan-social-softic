@@ -6,7 +6,7 @@ export default function ImportPage() {
   const [type, setType] = useState("Employés");
   const [fileName, setFileName] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
-
+const [previewData, setPreviewData] = useState<any[]>([]);
   const fakeErrors = {
     Employés: [
       "Ligne 42 : le champ matricule est obligatoire.",
@@ -42,9 +42,8 @@ function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
       setErrors(["Le fichier Excel est vide."]);
       return;
     }
-
-    localStorage.setItem("employeesData", JSON.stringify(jsonData));
-    setErrors([]);
+setPreviewData(jsonData);
+setErrors([]);
   };
 
   reader.readAsArrayBuffer(file);
@@ -231,9 +230,13 @@ function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
             >
               Annuler
             </button>
-
-            <button
-              disabled={!fileName || errors.length > 0}
+<button
+  onClick={() => {
+    localStorage.setItem("employeesData", JSON.stringify(previewData));
+    alert("Importation validée avec succès !");
+    window.location.href = "/dashboard";
+  }}
+  disabled={!fileName || errors.length > 0 || previewData.length === 0}
               className={`px-6 py-3 rounded font-bold text-sm text-white ${
                 fileName && errors.length === 0
                   ? "bg-[#061125]"

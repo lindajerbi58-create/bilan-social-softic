@@ -66,7 +66,15 @@ useEffect(() => {
 }, []);
 
 const effectifTotal = employees.length;
+const monthlyEffectif = Array.from({ length: 12 }, (_, monthIndex) => {
+  return employees.filter((e) => {
+    if (!e.dateEmbauche) return false;
+    const d = new Date(e.dateEmbauche);
+    return d.getMonth() <= monthIndex;
+  }).length;
+});
 
+const maxMonthly = Math.max(...monthlyEffectif, 1);
 function calculateAge(dateNaissance: string) {
   const birth = new Date(dateNaissance);
   const today = new Date();
@@ -91,7 +99,14 @@ const ageMoyen =
   ages.length > 0
     ? Math.round(ages.reduce((sum, age) => sum + age, 0) / ages.length)
     : 0;
-
+const ageGroups = {
+  "60+": ages.filter((a) => a >= 60).length,
+  "55-59": ages.filter((a) => a >= 55 && a <= 59).length,
+  "45-54": ages.filter((a) => a >= 45 && a <= 54).length,
+  "35-44": ages.filter((a) => a >= 35 && a <= 44).length,
+  "25-34": ages.filter((a) => a >= 25 && a <= 34).length,
+  "-25": ages.filter((a) => a < 25).length,
+};
 const femmes = employees.filter((e) => e.genre === "F").length;
 const hommes = employees.filter((e) => e.genre === "H").length;
 
@@ -123,7 +138,39 @@ const formations = employees.filter(
     e.formation === true ||
     e.formation === 1
 ).length;
-const hseScore = Math.max(0, 100 - accidents * 2);
+const totalAccidents = employees.reduce(
+  (total, e) => total + Number(e.accidents || 0),
+  0
+);
+const absenceRate =
+  effectifTotal > 0 ? Math.round((totalAbsences / effectifTotal) * 10) / 10 : 0;
+
+const topDepartment =
+  employees.length > 0
+    ? Object.entries(
+        employees.reduce((acc: Record<string, number>, e) => {
+          acc[e.department] = (acc[e.department] || 0) + Number(e.absenceJours || 0);
+          return acc;
+        }, {})
+      ).sort((a, b) => b[1] - a[1])[0]?.[0]
+    : "non défini";
+const hseScore =
+  effectifTotal > 0
+    ? Math.max(0, Math.round(100 - (totalAccidents / effectifTotal) * 100))
+    : 0;
+    const criticalAlerts = [];
+
+if (absenceRate > 3) {
+  criticalAlerts.push(`Absentéisme élevé : ${absenceRate} jours par employé`);
+}
+
+if (totalAccidents > 0) {
+  criticalAlerts.push(`Accidents déclarés : ${totalAccidents}`);
+}
+
+if (turnover > 10) {
+  criticalAlerts.push(`Turnover élevé : ${turnover}%`);
+}
   return (
     <main className="min-h-screen bg-[#f6f7fb] flex text-[#081326]">
       <aside className="w-64 bg-[#061125] text-white min-h-screen flex flex-col justify-between">
@@ -271,28 +318,27 @@ const hseScore = Math.max(0, 100 - accidents * 2);
               </div>
 
               <div className="flex items-end gap-5 h-56 mt-8">
-                {["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sept", "Oct", "Nov", "Déc"].map(
-                  (m, i) => (
-                    <div key={m} className="flex flex-col items-center gap-2 flex-1">
-                      <div
-                        className="w-8 bg-[#061125] rounded-t"
-                        style={{ height: `${120 - (i % 4) * 5}px` }}
-                      />
-                      <span className="text-xs text-gray-500">{m}</span>
-                    </div>
-                  )
-                )}
+              {["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sept", "Oct", "Nov", "Déc"].map(
+  (m, i) => (
+    <div key={m} className="flex flex-col items-center gap-2 flex-1">
+      <div
+        className="w-8 bg-[#061125] rounded-t"
+        style={{
+          height: `${(monthlyEffectif[i] / maxMonthly) * 160}px`,
+        }}
+      />
+      <span className="text-xs text-gray-500">{m}</span>
+    </div>
+  )
+)}
               </div>
             </div>
 
             <div className="bg-[#0b234a] text-white rounded-lg p-6">
               <h3 className="font-bold text-lg">✦ Analyse IA RH</h3>
-              <p className="text-sm italic mt-5 leading-6">
-                L’augmentation de 4.2% de l’absentéisme est principalement
-                localisée sur le site de Sfax dans le département Maintenance.
-                Cette tendance est corrélée avec une hausse de la charge de
-                travail de 15% sur le dernier trimestre.
-              </p>
+          L’analyse des données importées montre un taux moyen d’absence de {absenceRate} jour(s)
+par employé. Le département le plus concerné est {topDepartment}. 
+Le score HSE est estimé à {hseScore}/100 selon le nombre d’accidents déclarés.
 
               <div className="mt-6">
                 <div className="flex justify-between text-xs">
@@ -313,34 +359,41 @@ const hseScore = Math.max(0, 100 - accidents * 2);
           <div className="grid grid-cols-2 gap-5 mt-6">
             <div className="bg-white rounded-lg border p-6">
               <h3 className="font-bold">Pyramide des âges</h3>
-              <div className="mt-8 space-y-3">
-                <AgeBar label="60+" value="8" />
-                <AgeBar label="55-59" value="15" />
-                <AgeBar label="45-54" value="48" />
-                <AgeBar label="35-44" value="92" />
-              </div>
+        {Object.entries(ageGroups).map(([label, value]) => (
+  <AgeBar key={label} label={label} value={String(value)} />
+))}
             </div>
 
-            <div className="bg-white rounded-lg border p-6">
-              <div className="flex justify-between">
-                <h3 className="font-bold">Alertes RH Critiques</h3>
-                <span className="text-red-500 text-xs font-bold">
-                  4 Actions requises
-                </span>
-              </div>
+     <div className="bg-white rounded-lg border p-6">
+  <div className="flex justify-between">
+    <h3 className="font-bold">Alertes RH Critiques</h3>
 
-              <div className="bg-red-50 border border-red-100 rounded mt-6 p-4 flex justify-between">
-                <div>
-                  <p className="font-bold text-sm text-red-700">
-                    Visite médicale dépassée (12 employés)
-                  </p>
-                  <p className="text-xs text-red-400">
-                    Département: Exploitation - Priorité Haute
-                  </p>
-                </div>
-                <button className="text-xs font-bold">Traiter</button>
-              </div>
-            </div>
+    <span className="text-red-500 text-xs font-bold">
+      {criticalAlerts.length} Actions requises
+    </span>
+  </div>
+
+  {criticalAlerts.length > 0 ? (
+    criticalAlerts.map((alert) => (
+      <div
+        key={alert}
+        className="bg-red-50 border border-red-100 rounded mt-4 p-4 flex justify-between"
+      >
+        <p className="font-bold text-sm text-red-700">
+          {alert}
+        </p>
+
+        <button className="text-xs font-bold">
+          Traiter
+        </button>
+      </div>
+    ))
+  ) : (
+    <p className="text-sm text-green-600 mt-6">
+      Aucune alerte critique détectée.
+    </p>
+  )}
+</div>
           </div>
         </div>
       </section>
@@ -359,6 +412,7 @@ function Kpi({
   note: string;
   red?: boolean;
 }) {
+    
   return (
     <div className="bg-white rounded-lg border p-5 h-28">
       <p className="text-xs text-gray-400 font-bold">{title}</p>
