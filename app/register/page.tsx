@@ -4,7 +4,8 @@ import { useState } from "react";
 
 export default function RegisterPage() {
   const [role, setRole] = useState("RH");
-
+const [password, setPassword] = useState("");
+const [confirmPassword, setConfirmPassword] = useState("");
   return (
     <main className="min-h-screen bg-[#f6f7f9] flex flex-col items-center px-4 py-8">
       <div className="w-full max-w-[390px]">
@@ -27,9 +28,23 @@ export default function RegisterPage() {
 
           <Section title="Informations du compte" />
 
-          <Input label="Mot de passe" type="password" />
-          <Input label="Confirmer le mot de passe" type="password" />
-
+<Input
+  label="Mot de passe"
+  type="password"
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+/>
+       <Input
+  label="Confirmer le mot de passe"
+  type="password"
+  value={confirmPassword}
+  onChange={(e) => setConfirmPassword(e.target.value)}
+/>
+{confirmPassword && password !== confirmPassword && (
+  <p className="text-red-500 text-xs mt-1">
+    Les mots de passe ne correspondent pas.
+  </p>
+)}
           <Section title="Rôle demandé" />
 
           <div className="grid grid-cols-2 gap-3 mt-3">
@@ -77,10 +92,16 @@ export default function RegisterPage() {
             </label>
           </div>
 
-          <button className="w-full bg-[#0b234a] text-white font-bold rounded mt-6 py-3 text-sm shadow">
-            Créer un compte →
-          </button>
-
+      <button
+  disabled={password !== confirmPassword}
+  className={`w-full rounded mt-6 py-3 text-sm font-bold text-white ${
+    password === confirmPassword
+      ? "bg-[#0b234a]"
+      : "bg-gray-400 cursor-not-allowed"
+  }`}
+>
+  Créer un compte →
+</button>
           <a
             href="/"
             className="block text-center w-full border border-gray-200 rounded mt-3 py-3 text-sm font-semibold text-[#0b234a]"
@@ -118,17 +139,26 @@ function Input({
   label,
   placeholder,
   type = "text",
+  value,
+  onChange,
 }: {
   label: string;
   placeholder?: string;
   type?: string;
+  value?: string;
+  onChange?: React.ChangeEventHandler<HTMLInputElement>;
 }) {
   return (
     <div className="mt-3">
-      <label className="text-xs font-semibold text-gray-700">{label}</label>
+      <label className="text-xs font-semibold text-gray-700">
+        {label}
+      </label>
+
       <input
         type={type}
         placeholder={placeholder}
+        value={value}
+        onChange={onChange}
         className="mt-1 w-full h-10 border border-gray-300 rounded px-3 text-sm outline-none focus:border-[#0b234a]"
       />
     </div>
