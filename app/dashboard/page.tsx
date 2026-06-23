@@ -159,7 +159,19 @@ const hseScore =
     ? Math.max(0, Math.round(100 - (totalAccidents / effectifTotal) * 100))
     : 0;
     const criticalAlerts = [];
-
+const engagementScore = Math.max(
+  0,
+  Math.min(
+    100,
+    Math.round(
+      100 -
+      absenceRate * 5 -
+      turnover * 2 -
+      totalAccidents * 0.2 +
+      (formations / effectifTotal) * 20
+    )
+  )
+);
 if (absenceRate > 3) {
   criticalAlerts.push(`Absentéisme élevé : ${absenceRate} jours par employé`);
 }
@@ -343,10 +355,10 @@ Le score HSE est estimé à {hseScore}/100 selon le nombre d’accidents déclar
               <div className="mt-6">
                 <div className="flex justify-between text-xs">
                   <span>Score d’engagement estimé</span>
-                  <span>74%</span>
+                  <span>{engagementScore}%</span>
                 </div>
                 <div className="h-2 bg-[#31456d] rounded mt-2">
-                  <div className="h-2 bg-white rounded w-[74%]" />
+                  <div className="h-2 bg-white rounded style={{ width: `${engagementScore}%` }}" />
                 </div>
               </div>
 
