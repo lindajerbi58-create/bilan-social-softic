@@ -4,6 +4,8 @@ import { useState } from "react";
 
 export default function RegisterPage() {
   const [role, setRole] = useState("RH");
+  const [acceptConditions, setAcceptConditions] = useState(false);
+const [acceptPrivacy, setAcceptPrivacy] = useState(false);
 const [password, setPassword] = useState("");
 const [confirmPassword, setConfirmPassword] = useState("");
 const departments: Record<string, string[]> = {
@@ -191,31 +193,38 @@ const [poste, setPoste] = useState("");
 </div>
 
           <div className="mt-5 space-y-3 text-xs text-gray-600">
-            <label className="flex gap-2">
-              <input type="checkbox" />
-              <span>
-                J’accepte les{" "}
-                <a className="text-[#0b234a] underline" href="#">
-                  conditions d’utilisation
-                </a>
-              </span>
-            </label>
+           <label className="flex gap-2">
+  <input
+    type="checkbox"
+    checked={acceptConditions}
+    onChange={(e) => setAcceptConditions(e.target.checked)}
+  />
+  <span>
+    J’accepte les conditions d’utilisation
+  </span>
+</label>
 
-            <label className="flex gap-2">
-              <input type="checkbox" />
-              <span>
-                J’accepte la{" "}
-                <a className="text-[#0b234a] underline" href="#">
-                  politique de confidentialité
-                </a>
-              </span>
-            </label>
+<label className="flex gap-2">
+  <input
+    type="checkbox"
+    checked={acceptPrivacy}
+    onChange={(e) => setAcceptPrivacy(e.target.checked)}
+  />
+  <span>
+    J’accepte la politique de confidentialité
+  </span>
+</label>
           </div>
-
-      <button
-  disabled={password !== confirmPassword}
+<button
+  disabled={
+    password !== confirmPassword ||
+    !acceptConditions ||
+    !acceptPrivacy
+  }
   className={`w-full rounded mt-6 py-3 text-sm font-bold text-white ${
-    password === confirmPassword
+    password === confirmPassword &&
+    acceptConditions &&
+    acceptPrivacy
       ? "bg-[#0b234a]"
       : "bg-gray-400 cursor-not-allowed"
   }`}
