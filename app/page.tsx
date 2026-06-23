@@ -96,7 +96,15 @@ export default function LoginPage() {
         <button className="w-full bg-[#0b234a] text-white font-bold text-lg rounded mt-4 py-3 shadow-md">
           Se connecter
         </button>
-
+<p className="text-sm text-gray-600 mt-6 text-center">
+  Vous n'avez pas de compte ?{" "}
+  <a
+    href="/register"
+    className="text-[#0b234a] font-semibold hover:underline"
+  >
+    Créer un compte
+  </a>
+</p>
         <div className="border-t border-gray-200 mt-7 pt-5 text-center">
           <p className="text-xs font-semibold text-gray-700">
             Besoin d'assistance ?{" "}
