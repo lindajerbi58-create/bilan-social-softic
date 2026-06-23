@@ -1,4 +1,39 @@
+"use client";
+
+import { useState } from "react";
 export default function DashboardPage() {
+    const years = Array.from({ length: 21 }, (_, i) => 2026 - i);
+
+const departments = [
+  "Tous",
+  "Direction Générale",
+  "Engineering (Bureau d'Études)",
+  "Project Management",
+  "Procurement (Achats)",
+  "Construction",
+  "Commissioning & Start-up",
+  "Operations & Maintenance",
+  "QHSE",
+  "Business Development & Commercial",
+  "Finance & Administration",
+  "Ressources Humaines",
+  "IT / Systèmes d'information",
+];
+
+const sites = [
+  "Tous",
+  "Tunis Lac 2",
+  "Dubaï",
+  "Iraq",
+  "Sfax",
+  "Gabès",
+  "Algérie",
+  "Libye",
+];
+
+const [year, setYear] = useState("2026");
+const [department, setDepartment] = useState("Tous");
+const [site, setSite] = useState("Tous");
   const menu = [
     "Dashboard",
     "Employés",
@@ -61,12 +96,48 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex gap-3">
-            <button className="border px-4 py-2 rounded text-sm">Année: 2024⌄</button>
-            <button className="border px-4 py-2 rounded text-sm">Département: Tous⌄</button>
-            <button className="border px-4 py-2 rounded text-sm">Site: Tous⌄</button>
-            <button className="bg-[#061125] text-white px-5 py-2 rounded text-sm font-bold">
-              Exporter PDF
-            </button>
+            <select
+  value={year}
+  onChange={(e) => setYear(e.target.value)}
+  className="border px-4 py-2 rounded text-sm bg-white"
+>
+  {years.map((y) => (
+    <option key={y} value={y}>
+      Année: {y}
+    </option>
+  ))}
+</select>
+
+<select
+  value={department}
+  onChange={(e) => setDepartment(e.target.value)}
+  className="border px-4 py-2 rounded text-sm bg-white"
+>
+  {departments.map((dep) => (
+    <option key={dep} value={dep}>
+      Département: {dep}
+    </option>
+  ))}
+</select>
+
+<select
+  value={site}
+  onChange={(e) => setSite(e.target.value)}
+  className="border px-4 py-2 rounded text-sm bg-white"
+>
+  {sites.map((s) => (
+    <option key={s} value={s}>
+      Site: {s}
+    </option>
+  ))}
+</select>
+
+<button
+  onClick={() => alert(`Export PDF - Année ${year}, Département ${department}, Site ${site}`)}
+  className="bg-[#061125] text-white px-5 py-2 rounded text-sm font-bold"
+>
+  Exporter PDF
+</button>
           </div>
         </header>
 
