@@ -4,6 +4,15 @@ import { useState } from "react";
 
 export default function RegisterPage() {
   const [role, setRole] = useState("RH");
+  const [fullName, setFullName] = useState("");
+const [email, setEmail] = useState("");
+const [phone, setPhone] = useState("");
+const tunisianPhoneRegex = /^(\+216)?[2459]\d{7}$/;
+
+const isPhoneValid = tunisianPhoneRegex.test(
+  phone.replace(/\s/g, "")
+);
+
   const [acceptConditions, setAcceptConditions] = useState(false);
 const [acceptPrivacy, setAcceptPrivacy] = useState(false);
 const [password, setPassword] = useState("");
@@ -86,6 +95,17 @@ const departments: Record<string, string[]> = {
 
 const [department, setDepartment] = useState("");
 const [poste, setPoste] = useState("");
+const isFormValid =
+  fullName.trim() !== "" &&
+  email.trim() !== "" &&
+  isPhoneValid &&
+  department !== "" &&
+  poste !== "" &&
+  password !== "" &&
+  confirmPassword !== "" &&
+  password === confirmPassword &&
+  acceptConditions &&
+  acceptPrivacy;
   return (
     <main className="min-h-screen bg-[#f6f7f9] flex flex-col items-center px-4 py-8">
       <div className="w-full max-w-[390px]">
@@ -102,9 +122,32 @@ const [poste, setPoste] = useState("");
 
           <Section title="Informations personnelles" />
 
-          <Input label="Nom complet" placeholder="Ex: Anis Dupont" />
-          <Input label="Email professionnel" placeholder="anis.dupont@entreprise.com" />
-          <Input label="Téléphone" placeholder="+216 00 000 000" />
+         <Input
+  label="Nom complet"
+  placeholder="Ex: Anis Dupont"
+  value={fullName}
+  onChange={(e) => setFullName(e.target.value)}
+/>
+
+<Input
+  label="Email professionnel"
+  placeholder="anis.dupont@entreprise.com"
+  value={email}
+  onChange={(e) => setEmail(e.target.value)}
+/>
+
+<Input
+  label="Téléphone"
+  placeholder="+216 00 000 000"
+  value={phone}
+  onChange={(e) => setPhone(e.target.value)}
+/>
+
+{phone !== "" && !isPhoneValid && (
+  <p className="text-red-500 text-xs mt-1">
+    Numéro tunisien invalide.
+  </p>
+)}
 
           <Section title="Informations du compte" />
 
@@ -216,15 +259,9 @@ const [poste, setPoste] = useState("");
 </label>
           </div>
 <button
-  disabled={
-    password !== confirmPassword ||
-    !acceptConditions ||
-    !acceptPrivacy
-  }
+  disabled={!isFormValid}
   className={`w-full rounded mt-6 py-3 text-sm font-bold text-white ${
-    password === confirmPassword &&
-    acceptConditions &&
-    acceptPrivacy
+    isFormValid
       ? "bg-[#0b234a]"
       : "bg-gray-400 cursor-not-allowed"
   }`}
