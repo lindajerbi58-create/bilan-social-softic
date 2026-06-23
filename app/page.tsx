@@ -1,4 +1,8 @@
+"use client";
+
+import { useState } from "react";
 export default function LoginPage() {
+  const [role, setRole] = useState("Admin");
   return (
     <main className="min-h-screen bg-[#f6f7f9] flex flex-col items-center justify-center px-4">
       <div className="mb-7 text-center">
