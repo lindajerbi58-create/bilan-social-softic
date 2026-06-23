@@ -1,6 +1,9 @@
+
+
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
 export default function DashboardPage() {
     const years = Array.from({ length: 21 }, (_, i) => 2026 - i);
 
@@ -53,7 +56,74 @@ const [site, setSite] = useState("Tous");
     "Paramètres",
     "Aide",
   ];
+const [employees, setEmployees] = useState<any[]>([]);
 
+useEffect(() => {
+  const storedData = localStorage.getItem("employeesData");
+  if (storedData) {
+    setEmployees(JSON.parse(storedData));
+  }
+}, []);
+
+const effectifTotal = employees.length;
+
+function calculateAge(dateNaissance: string) {
+  const birth = new Date(dateNaissance);
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < birth.getDate())
+  ) {
+    age--;
+  }
+
+  return age;
+}
+
+const ages = employees
+  .map((e) => calculateAge(e.dateNaissance))
+  .filter((age) => !isNaN(age));
+
+const ageMoyen =
+  ages.length > 0
+    ? Math.round(ages.reduce((sum, age) => sum + age, 0) / ages.length)
+    : 0;
+
+const femmes = employees.filter((e) => e.genre === "F").length;
+const hommes = employees.filter((e) => e.genre === "H").length;
+
+const tauxFemmes =
+  effectifTotal > 0 ? Math.round((femmes / effectifTotal) * 100) : 0;
+
+const departs = employees.filter((e) => e.statut === "Sorti").length;
+
+const turnover =
+  effectifTotal > 0 ? Math.round((departs / effectifTotal) * 100) : 0;
+
+const accidents = employees.reduce(
+  (total, e) => total + Number(e.accidents || 0),
+  0
+);
+const masseSalariale = employees.reduce(
+  (total, e) => total + Number(e.salaire || 0),
+  0
+);
+
+const totalAbsences = employees.reduce(
+  (total, e) => total + Number(e.absenceJours || 0),
+  0
+);
+
+const formations = employees.filter(
+  (e) =>
+    e.formation === "Oui" ||
+    e.formation === true ||
+    e.formation === 1
+).length;
+const hseScore = Math.max(0, 100 - accidents * 2);
   return (
     <main className="min-h-screen bg-[#f6f7fb] flex text-[#081326]">
       <aside className="w-64 bg-[#061125] text-white min-h-screen flex flex-col justify-between">
@@ -143,14 +213,54 @@ const [site, setSite] = useState("Tous");
 
         <div className="p-6">
           <div className="grid grid-cols-4 gap-5">
-            <Kpi title="EFFECTIF TOTAL" value="350" note="+12" />
-            <Kpi title="H (280) / F (70)" value="20%" note="Taux de féminisation" />
-            <Kpi title="MASSE SALARIALE" value="8.4M TND" note="-3.4%" red />
-            <Kpi title="TAUX D’ABSENTÉISME" value="4.2%" note="+0.2%" red />
-            <Kpi title="ÂGE MOYEN" value="38 ans" note="" />
-            <Kpi title="TURNOVER" value="7%" note="—" />
-            <Kpi title="FORMATIONS" value="45 Sessions" note="+5 vs N-1" />
-            <Kpi title="HSE SCORE" value="98/100" note="✅" />
+          <Kpi
+  title="EFFECTIF TOTAL"
+  value={String(effectifTotal)}
+  note="Données importées"
+/>
+
+<Kpi
+  title={`H (${hommes}) / F (${femmes})`}
+  value={`${tauxFemmes}%`}
+  note="Taux de féminisation"
+/>
+
+<Kpi
+  title="MASSE SALARIALE"
+  value={`${masseSalariale.toLocaleString()} TND`}
+  note="Calcul auto"
+/>
+
+<Kpi
+  title="JOURS D’ABSENCE"
+  value={String(totalAbsences)}
+  note="Total importé"
+  red
+/>
+
+<Kpi
+  title="ÂGE MOYEN"
+  value={`${ageMoyen} ans`}
+  note="Calcul auto"
+/>
+
+<Kpi
+  title="TURNOVER"
+  value={`${turnover}%`}
+  note="Selon sorties"
+/>
+
+<Kpi
+  title="FORMATIONS"
+  value={String(formations)}
+  note="Employés formés"
+/>
+
+<Kpi
+  title="HSE SCORE"
+  value={`${hseScore}/100`}
+  note="Calcul auto"
+/>
           </div>
 
           <div className="grid grid-cols-3 gap-5 mt-6">

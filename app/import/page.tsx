@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
+import * as XLSX from "xlsx";
 export default function ImportPage() {
   const [type, setType] = useState("Employés");
   const [fileName, setFileName] = useState("");
@@ -22,14 +22,33 @@ export default function ImportPage() {
     ],
   };
 
-  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
+function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+  const file = e.target.files?.[0];
+  if (!file) return;
 
-    if (!file) return;
+  setFileName(file.name);
 
-    setFileName(file.name);
-    setErrors(fakeErrors[type as keyof typeof fakeErrors] || []);
-  }
+  const reader = new FileReader();
+
+  reader.onload = (event) => {
+    const data = event.target?.result;
+    const workbook = XLSX.read(data, { type: "array" });
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+
+    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+    if (jsonData.length === 0) {
+      setErrors(["Le fichier Excel est vide."]);
+      return;
+    }
+
+    localStorage.setItem("employeesData", JSON.stringify(jsonData));
+    setErrors([]);
+  };
+
+  reader.readAsArrayBuffer(file);
+}
 
   return (
     <main className="min-h-screen bg-[#f7f8fb] flex">
