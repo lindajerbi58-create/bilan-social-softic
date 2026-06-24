@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 type Employee = {
   matricule?: string;
   nom?: string;
@@ -38,7 +39,45 @@ export default function DashboardPage() {
   ];
 
   const sites = ["Tous", "Tunis Lac 2", "Dubaï", "Iraq", "Sfax", "Gabès", "Algérie", "Libye"];
+const exportPDF = () => {
+  const doc = new jsPDF();
 
+  doc.setFontSize(18);
+  doc.text("Rapport Bilan Social", 14, 20);
+
+  doc.setFontSize(11);
+  doc.text(`Année : ${year}`, 14, 30);
+  doc.text(`Département : ${department}`, 14, 37);
+  doc.text(`Site : ${site}`, 14, 44);
+
+  autoTable(doc, {
+    startY: 55,
+    head: [["Indicateur", "Valeur"]],
+    body: [
+      ["Effectif Total", effectifTotal],
+      ["Hommes", hommes],
+      ["Femmes", femmes],
+      ["Taux de féminisation", `${tauxFemmes}%`],
+      ["Masse salariale", `${masseSalariale.toLocaleString()} TND`],
+      ["Jours d'absence", totalAbsences],
+      ["Âge moyen", `${ageMoyen} ans`],
+      ["Turnover", `${turnover}%`],
+      ["Formations", formations],
+      ["HSE Score", `${hseScore}/100`],
+      ["Engagement", `${engagementScore}%`],
+    ],
+  });
+
+  autoTable(doc, {
+    startY: (doc as any).lastAutoTable.finalY + 15,
+    head: [["Département", "Site", "Employés"]],
+    body: [
+      [department, site, effectifTotal],
+    ],
+  });
+
+  doc.save("Bilan_Social.pdf");
+};
   const [year, setYear] = useState("Tous");
   const [department, setDepartment] = useState("Tous");
   const [site, setSite] = useState("Tous");
@@ -287,12 +326,8 @@ export default function DashboardPage() {
               ))}
             </select>
 
-            <button
-              onClick={() =>
-                alert(
-                  `Export PDF - Année ${year}, Département ${department}, Site ${site}`
-                )
-              }
+           <button
+  onClick={exportPDF}
               className="bg-[#061125] text-white px-5 py-2 rounded text-sm font-bold"
             >
               Exporter PDF
