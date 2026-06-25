@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import * as XLSX from "xlsx";
 import Link from "next/link";
+
 type Employee = {
   matricule: string;
   nom: string;
@@ -36,13 +37,25 @@ function normalizeEmployee(row: any): Employee {
   return {
     matricule: String(result.matricule ?? ""),
     nom: String(result.nom ?? ""),
-    prenom: String(result.prenom ?? result.prénom ?? ""),
+    prenom: String(result.prenom ?? ""),
     genre: String(result.genre ?? result.sexe ?? ""),
-    age: String(result.age ?? ""),
+    age: String(result.age ?? result.âge ?? ""),
     departement: String(result.departement ?? result.department ?? ""),
-    poste: String(result.poste ?? result.fonction ?? ""),
-    contrat: String(result.contrat ?? ""),
-    anciennete: String(result.anciennete ?? ""),
+    poste: String(result.poste ?? result.fonction ?? result.emploi ?? ""),
+    contrat: String(
+      result.contrat ??
+        result.typecontrat ??
+        result.typedecontrat ??
+        result.naturecontrat ??
+        ""
+    ),
+    anciennete: String(
+      result.anciennete ??
+        result.anneesanciennete ??
+        result.experience ??
+        result.duree ??
+        ""
+    ),
     salaire: String(result.salaire ?? result.salairetnd ?? ""),
     statut: String(result.statut ?? result.status ?? ""),
   };
@@ -61,9 +74,7 @@ function SidebarItem({
     <Link
       href={href}
       className={`px-5 py-3 text-sm flex items-center gap-3 cursor-pointer ${
-        active
-          ? "bg-[#111c33] text-white"
-          : "text-slate-300 hover:bg-[#111c33]"
+        active ? "bg-[#111c33] text-white" : "text-slate-300 hover:bg-[#111c33]"
       }`}
     >
       <span className="w-3 h-3 border border-slate-300 rounded-sm" />
@@ -71,7 +82,16 @@ function SidebarItem({
     </Link>
   );
 }
-function Kpi({ title, value, note }: { title: string; value: string; note: string }) {
+
+function Kpi({
+  title,
+  value,
+  note,
+}: {
+  title: string;
+  value: string;
+  note: string;
+}) {
   return (
     <div className="bg-white border rounded-md p-5 shadow-sm">
       <p className="text-xs text-slate-500">{title}</p>
@@ -84,6 +104,16 @@ function Kpi({ title, value, note }: { title: string; value: string; note: strin
 export default function EmployesPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const storedData = localStorage.getItem("employeesData");
+
+    if (storedData) {
+      const parsedData = JSON.parse(storedData);
+      const normalizedData = parsedData.map((row: any) => normalizeEmployee(row));
+      setEmployees(normalizedData);
+    }
+  }, []);
 
   const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -100,6 +130,7 @@ export default function EmployesPage() {
       const normalized = rows.map((row: any) => normalizeEmployee(row));
 
       setEmployees(normalized);
+      localStorage.setItem("employeesData", JSON.stringify(normalized));
     };
 
     reader.readAsArrayBuffer(file);
@@ -113,15 +144,17 @@ export default function EmployesPage() {
 
     const worksheet = XLSX.utils.json_to_sheet(employees);
     const workbook = XLSX.utils.book_new();
+
     XLSX.utils.book_append_sheet(workbook, worksheet, "Employes");
     XLSX.writeFile(workbook, "employes_export.xlsx");
   };
 
   const effectifTotal = employees.length;
 
-  const femmes = employees.filter(
-    (e) => e.genre.toLowerCase().trim() === "femme"
-  ).length;
+  const femmes = employees.filter((e) => {
+    const genre = e.genre.toLowerCase().trim();
+    return genre === "femme" || genre === "f" || genre === "female";
+  }).length;
 
   const tauxFemmes =
     effectifTotal > 0 ? ((femmes / effectifTotal) * 100).toFixed(1) : "0";
@@ -152,25 +185,25 @@ export default function EmployesPage() {
           EPPM RH
         </div>
 
-      <nav className="py-4">
-  <SidebarItem text="Dashboard" href="/dashboard" />
-  <SidebarItem text="Employés" href="/Employe" />
-  <SidebarItem text="Profil" href="/Profil" />
-  <SidebarItem text="Effectif" href="/Effectif" />
-  <SidebarItem text="Rémunération" href="/Remuneration" />
-  <SidebarItem text="Absences" href="/Absences" />
-  <SidebarItem text="Rendement" href="/Rendement" />
-  <SidebarItem text="Recrutement" href="/Recrutement" />
-  <SidebarItem text="Formation" href="/Formation" />
-  <SidebarItem text="Accidents/HSE" href="/AccidentsHSE" />
-  <SidebarItem text="Analyse" href="/Analyse" />
-  <SidebarItem text="Comparaison" href="/Comparaison" />
-  <SidebarItem text="Rapports" href="/Rapports" />
-  <SidebarItem text="Import" href="/import" />
-  <SidebarItem text="Audit" href="/Audit" />
-  <SidebarItem text="Paramètres" href="/Parametres" />
-  <SidebarItem text="Aide" href="/Aide" />
-</nav>
+        <nav className="py-4">
+          <SidebarItem text="Dashboard" href="/dashboard" />
+          <SidebarItem text="Employés" href="/Employe" active />
+          <SidebarItem text="Profil" href="/Profil" />
+          <SidebarItem text="Effectif" href="/Effectif" />
+          <SidebarItem text="Rémunération" href="/Remuneration" />
+          <SidebarItem text="Absences" href="/Absences" />
+          <SidebarItem text="Rendement" href="/Rendement" />
+          <SidebarItem text="Recrutement" href="/Recrutement" />
+          <SidebarItem text="Formation" href="/Formation" />
+          <SidebarItem text="Accidents/HSE" href="/AccidentsHSE" />
+          <SidebarItem text="Analyse" href="/Analyse" />
+          <SidebarItem text="Comparaison" href="/Comparaison" />
+          <SidebarItem text="Rapports" href="/Rapports" />
+          <SidebarItem text="Import" href="/import" />
+          <SidebarItem text="Audit" href="/Audit" />
+          <SidebarItem text="Paramètres" href="/Parametres" />
+          <SidebarItem text="Aide" href="/Aide" />
+        </nav>
       </aside>
 
       <main className="flex-1">
@@ -257,10 +290,26 @@ export default function EmployesPage() {
           </div>
 
           <div className="grid grid-cols-4 gap-5 mt-6">
-            <Kpi title="Effectif Total" value={String(effectifTotal)} note="Calculé depuis Excel" />
-            <Kpi title="Taux de Féminisation" value={`${tauxFemmes}%`} note={`${femmes} femmes`} />
-            <Kpi title="Âge Moyen" value={`${ageMoyen} ans`} note="Calcul automatique" />
-            <Kpi title="Masse Salariale" value={`${masseSalariale} TND`} note="Somme des salaires" />
+            <Kpi
+              title="Effectif Total"
+              value={String(effectifTotal)}
+              note="Calculé depuis Excel"
+            />
+            <Kpi
+              title="Taux de Féminisation"
+              value={`${tauxFemmes}%`}
+              note={`${femmes} femmes`}
+            />
+            <Kpi
+              title="Âge Moyen"
+              value={`${ageMoyen} ans`}
+              note="Calcul automatique"
+            />
+            <Kpi
+              title="Masse Salariale"
+              value={`${masseSalariale} TND`}
+              note="Somme des salaires"
+            />
           </div>
         </section>
       </main>
