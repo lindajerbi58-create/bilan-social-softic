@@ -18,7 +18,31 @@ type Employee = {
   statut?: string;
   accidents?: number | string;
 };
+import Link from "next/link";
 
+function SidebarItem({
+  text,
+  href,
+  active,
+}: {
+  text: string;
+  href: string;
+  active?: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      className={`px-5 py-3 text-sm flex items-center gap-3 cursor-pointer ${
+        active
+          ? "bg-[#111c33] text-white"
+          : "text-slate-300 hover:bg-[#111c33]"
+      }`}
+    >
+      <span className="w-3 h-3 border border-slate-300 rounded-sm" />
+      {text}
+    </Link>
+  );
+}
 export default function DashboardPage() {
   const years = ["Tous", ...Array.from({ length: 21 }, (_, i) => String(2026 - i))];
 

@@ -2,7 +2,7 @@
 
 import React, { useMemo, useRef, useState } from "react";
 import * as XLSX from "xlsx";
-
+import Link from "next/link";
 type Employee = {
   matricule: string;
   nom: string;
@@ -48,19 +48,29 @@ function normalizeEmployee(row: any): Employee {
   };
 }
 
-function SidebarItem({ text, active }: { text: string; active?: boolean }) {
+function SidebarItem({
+  text,
+  href,
+  active,
+}: {
+  text: string;
+  href: string;
+  active?: boolean;
+}) {
   return (
-    <div
+    <Link
+      href={href}
       className={`px-5 py-3 text-sm flex items-center gap-3 cursor-pointer ${
-        active ? "bg-[#111c33] text-white" : "text-slate-300 hover:bg-[#111c33]"
+        active
+          ? "bg-[#111c33] text-white"
+          : "text-slate-300 hover:bg-[#111c33]"
       }`}
     >
-      <span className="w-4 h-4 bg-slate-400 rounded-sm" />
+      <span className="w-3 h-3 border border-slate-300 rounded-sm" />
       {text}
-    </div>
+    </Link>
   );
 }
-
 function Kpi({ title, value, note }: { title: string; value: string; note: string }) {
   return (
     <div className="bg-white border rounded-md p-5 shadow-sm">
@@ -142,17 +152,25 @@ export default function EmployesPage() {
           EPPM RH
         </div>
 
-        <nav className="py-4">
-          <SidebarItem text="Dashboard" />
-          <SidebarItem text="Employés" active />
-          <SidebarItem text="Profil" />
-          <SidebarItem text="Effectif" />
-          <SidebarItem text="Rémunération" />
-          <SidebarItem text="Absences" />
-          <SidebarItem text="Rendement" />
-          <SidebarItem text="Recrutement" />
-          <SidebarItem text="Paramètres" />
-        </nav>
+      <nav className="py-4">
+  <SidebarItem text="Dashboard" href="/dashboard" />
+  <SidebarItem text="Employés" href="/Employe" />
+  <SidebarItem text="Profil" href="/Profil" />
+  <SidebarItem text="Effectif" href="/Effectif" />
+  <SidebarItem text="Rémunération" href="/Remuneration" />
+  <SidebarItem text="Absences" href="/Absences" />
+  <SidebarItem text="Rendement" href="/Rendement" />
+  <SidebarItem text="Recrutement" href="/Recrutement" />
+  <SidebarItem text="Formation" href="/Formation" />
+  <SidebarItem text="Accidents/HSE" href="/AccidentsHSE" />
+  <SidebarItem text="Analyse" href="/Analyse" />
+  <SidebarItem text="Comparaison" href="/Comparaison" />
+  <SidebarItem text="Rapports" href="/Rapports" />
+  <SidebarItem text="Import" href="/import" />
+  <SidebarItem text="Audit" href="/Audit" />
+  <SidebarItem text="Paramètres" href="/Parametres" />
+  <SidebarItem text="Aide" href="/Aide" />
+</nav>
       </aside>
 
       <main className="flex-1">

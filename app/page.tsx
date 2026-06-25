@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 export default function LoginPage() {
   const [role, setRole] = useState("Admin");
   return (
@@ -97,7 +98,7 @@ export default function LoginPage() {
   href="/dashboard"
   className="block text-center w-full bg-[#0b234a] text-white font-bold text-lg rounded mt-4 py-3 shadow-md"
 >
-  
+
   Se connecter
 </a>
 <p className="text-sm text-gray-600 mt-6 text-center">
