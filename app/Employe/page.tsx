@@ -104,7 +104,21 @@ function Kpi({
 export default function EmployesPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+const [showForm, setShowForm] = useState(false);
 
+const [newEmployee, setNewEmployee] = useState<Employee>({
+  matricule: "",
+  nom: "",
+  prenom: "",
+  genre: "",
+  age: "",
+  departement: "",
+  poste: "",
+  contrat: "",
+  anciennete: "",
+  salaire: "",
+  statut: "Actif",
+});
   useEffect(() => {
     const storedData = localStorage.getItem("employeesData");
 
@@ -114,7 +128,33 @@ export default function EmployesPage() {
       setEmployees(normalizedData);
     }
   }, []);
+const addEmployee = () => {
+  if (!newEmployee.matricule || !newEmployee.nom || !newEmployee.prenom) {
+    alert("Matricule, nom et prénom sont obligatoires");
+    return;
+  }
 
+  const updatedEmployees = [...employees, newEmployee];
+
+  setEmployees(updatedEmployees);
+  localStorage.setItem("employeesData", JSON.stringify(updatedEmployees));
+
+  setNewEmployee({
+    matricule: "",
+    nom: "",
+    prenom: "",
+    genre: "",
+    age: "",
+    departement: "",
+    poste: "",
+    contrat: "",
+    anciennete: "",
+    salaire: "",
+    statut: "Actif",
+  });
+
+  setShowForm(false);
+};
   const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -177,7 +217,43 @@ export default function EmployesPage() {
 
     return total.toFixed(1);
   }, [employees]);
+const departments = [
+  "Direction Générale",
+  "Engineering (Bureau d'Études)",
+  "Project Management",
+  "Procurement (Achats)",
+  "Construction",
+  "Commissioning & Start-up",
+  "Operations & Maintenance",
+  "QHSE",
+  "Business Development & Commercial",
+  "Finance & Administration",
+  "Ressources Humaines",
+  "IT / Systèmes d'information",
+];
 
+const postes = [
+  "Manager",
+  "Ingénieur",
+  "Technicien",
+  "Chef de projet",
+  "Responsable RH",
+  "Comptable",
+  "Acheteur",
+  "Assistant",
+  "Superviseur",
+];
+
+const contrats = ["CDI", "CDD", "SIVP", "Stage", "Freelance"];
+
+const generateNextMatricule = () => {
+  const numbers = employees
+    .map((e) => Number(String(e.matricule).replace(/\D/g, "")))
+    .filter((n) => !isNaN(n));
+
+  const max = numbers.length > 0 ? Math.max(...numbers) : 0;
+  return `EMP${String(max + 1).padStart(4, "0")}`;
+};
   return (
     <div className="min-h-screen bg-[#f4f5f8] flex font-sans text-[#0b1730]">
       <aside className="w-64 bg-[#071127] text-white min-h-screen">
@@ -214,9 +290,27 @@ export default function EmployesPage() {
           </div>
 
           <div className="flex gap-3">
-            <button className="bg-[#071127] text-white text-xs px-4 py-2 rounded">
-              + Ajouter employé
-            </button>
+<button
+  onClick={() => {
+    setNewEmployee({
+      matricule: generateNextMatricule(),
+      nom: "",
+      prenom: "",
+      genre: "F",
+      age: "",
+      departement: departments[0],
+      poste: postes[0],
+      contrat: contrats[0],
+      anciennete: "",
+      salaire: "",
+      statut: "Actif",
+    });
+    setShowForm(true);
+  }}
+  className="bg-[#071127] text-white text-xs px-4 py-2 rounded"
+>
+  + Ajouter employé
+</button>
 
             <input
               type="file"
@@ -226,12 +320,7 @@ export default function EmployesPage() {
               onChange={handleImport}
             />
 
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="border text-xs px-4 py-2 rounded bg-white"
-            >
-              Importer Excel
-            </button>
+          
 
             <button
               onClick={exportExcel}
@@ -243,6 +332,178 @@ export default function EmployesPage() {
         </header>
 
         <section className="p-8">
+        {showForm && (
+  <div className="bg-white border rounded-md shadow-sm p-6 mb-6">
+    <h2 className="font-bold text-lg mb-4">Ajouter un employé</h2>
+
+    <div className="grid grid-cols-4 gap-4">
+      <div>
+        <label className="text-xs text-slate-500">Matricule</label>
+        <input
+          value={newEmployee.matricule}
+          readOnly
+          className="w-full mt-1 border rounded px-3 py-2 text-sm bg-gray-100"
+        />
+      </div>
+
+      <div>
+        <label className="text-xs text-slate-500">Nom</label>
+        <input
+          value={newEmployee.nom}
+          onChange={(e) =>
+            setNewEmployee({ ...newEmployee, nom: e.target.value })
+          }
+          className="w-full mt-1 border rounded px-3 py-2 text-sm"
+        />
+      </div>
+
+      <div>
+        <label className="text-xs text-slate-500">Prénom</label>
+        <input
+          value={newEmployee.prenom}
+          onChange={(e) =>
+            setNewEmployee({ ...newEmployee, prenom: e.target.value })
+          }
+          className="w-full mt-1 border rounded px-3 py-2 text-sm"
+        />
+      </div>
+
+      <div>
+        <label className="text-xs text-slate-500">Genre</label>
+        <select
+          value={newEmployee.genre}
+          onChange={(e) =>
+            setNewEmployee({ ...newEmployee, genre: e.target.value })
+          }
+          className="w-full mt-1 border rounded px-3 py-2 text-sm"
+        >
+          <option value="F">F</option>
+          <option value="H">H</option>
+        </select>
+      </div>
+
+      <div>
+        <label className="text-xs text-slate-500">Âge</label>
+        <input
+          type="number"
+          min="18"
+          max="70"
+          value={newEmployee.age}
+          onChange={(e) =>
+            setNewEmployee({ ...newEmployee, age: e.target.value })
+          }
+          className="w-full mt-1 border rounded px-3 py-2 text-sm"
+        />
+      </div>
+
+      <div>
+        <label className="text-xs text-slate-500">Département</label>
+        <select
+          value={newEmployee.departement}
+          onChange={(e) =>
+            setNewEmployee({ ...newEmployee, departement: e.target.value })
+          }
+          className="w-full mt-1 border rounded px-3 py-2 text-sm"
+        >
+          {departments.map((dep) => (
+            <option key={dep} value={dep}>
+              {dep}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label className="text-xs text-slate-500">Poste</label>
+        <select
+          value={newEmployee.poste}
+          onChange={(e) =>
+            setNewEmployee({ ...newEmployee, poste: e.target.value })
+          }
+          className="w-full mt-1 border rounded px-3 py-2 text-sm"
+        >
+          {postes.map((poste) => (
+            <option key={poste} value={poste}>
+              {poste}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label className="text-xs text-slate-500">Contrat</label>
+        <select
+          value={newEmployee.contrat}
+          onChange={(e) =>
+            setNewEmployee({ ...newEmployee, contrat: e.target.value })
+          }
+          className="w-full mt-1 border rounded px-3 py-2 text-sm"
+        >
+          {contrats.map((contrat) => (
+            <option key={contrat} value={contrat}>
+              {contrat}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label className="text-xs text-slate-500">Ancienneté</label>
+        <input
+          value={newEmployee.anciennete}
+          onChange={(e) =>
+            setNewEmployee({ ...newEmployee, anciennete: e.target.value })
+          }
+          placeholder="Ex: 2 ans"
+          className="w-full mt-1 border rounded px-3 py-2 text-sm"
+        />
+      </div>
+
+      <div>
+        <label className="text-xs text-slate-500">Salaire</label>
+        <input
+          type="number"
+          min="0"
+          value={newEmployee.salaire}
+          onChange={(e) =>
+            setNewEmployee({ ...newEmployee, salaire: e.target.value })
+          }
+          className="w-full mt-1 border rounded px-3 py-2 text-sm"
+        />
+      </div>
+
+      <div>
+        <label className="text-xs text-slate-500">Statut</label>
+        <select
+          value={newEmployee.statut}
+          onChange={(e) =>
+            setNewEmployee({ ...newEmployee, statut: e.target.value })
+          }
+          className="w-full mt-1 border rounded px-3 py-2 text-sm"
+        >
+          <option value="Actif">Actif</option>
+          <option value="Sorti">Sorti</option>
+        </select>
+      </div>
+    </div>
+
+    <div className="flex justify-end gap-3 mt-5">
+      <button
+        onClick={() => setShowForm(false)}
+        className="border px-5 py-2 rounded text-sm"
+      >
+        Annuler
+      </button>
+
+      <button
+        onClick={addEmployee}
+        className="bg-[#071127] text-white px-5 py-2 rounded text-sm"
+      >
+        Enregistrer
+      </button>
+    </div>
+  </div>
+)}
           <div className="bg-white border rounded-md shadow-sm overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-[#f7f8fb] text-slate-500">
