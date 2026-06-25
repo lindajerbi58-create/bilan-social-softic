@@ -106,6 +106,35 @@ const isFormValid =
   password === confirmPassword &&
   acceptConditions &&
   acceptPrivacy;
+  const handleSubmit = async () => {
+  if (!isFormValid) return;
+
+  const res = await fetch("/api/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      fullName,
+      email,
+      phone,
+      password,
+      role,
+      department,
+      poste,
+    }),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert(data.error || "Erreur lors de la création du compte");
+    return;
+  }
+
+  alert("Compte créé avec succès");
+  window.location.href = "/";
+};
   return (
     <main className="min-h-screen bg-[#f6f7f9] flex flex-col items-center px-4 py-8">
       <div className="w-full max-w-[390px]">
@@ -259,6 +288,8 @@ const isFormValid =
 </label>
           </div>
 <button
+  type="button"
+  onClick={handleSubmit}
   disabled={!isFormValid}
   className={`w-full rounded mt-6 py-3 text-sm font-bold text-white ${
     isFormValid

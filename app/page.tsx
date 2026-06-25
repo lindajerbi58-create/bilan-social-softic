@@ -2,8 +2,42 @@
 
 import { useState } from "react";
 import Link from "next/link";
+
 export default function LoginPage() {
   const [role, setRole] = useState("Admin");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const isFormValid = email.trim() !== "" && password.trim() !== "";
+
+  const handleLogin = async () => {
+    if (!isFormValid) {
+      alert("Veuillez remplir l'email et le mot de passe");
+      return;
+    }
+
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+        role,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error || "Erreur de connexion");
+      return;
+    }
+
+    window.location.href = "/dashboard";
+  };
+
   return (
     <main className="min-h-screen bg-[#f6f7f9] flex flex-col items-center justify-center px-4">
       <div className="mb-7 text-center">
@@ -15,6 +49,7 @@ export default function LoginPage() {
             EPPM <span className="font-light">RH</span>
           </h1>
         </div>
+
         <p className="text-[10px] tracking-[2px] font-semibold text-gray-800 mt-1">
           HUMAN CAPITAL INTELLIGENCE
         </p>
@@ -34,35 +69,39 @@ export default function LoginPage() {
             RÔLE UTILISATEUR
           </label>
 
-         <div className="grid grid-cols-2 gap-1 mt-2">
-  {["Admin", "RH", "Direction", "Lecture seule"].map((r) => (
-    <button
-      key={r}
-      type="button"
-      onClick={() => setRole(r)}
-      className={`rounded px-3 py-2 text-xs font-bold ${
-        role === r
-          ? "bg-[#0b234a] text-white"
-          : "border border-gray-300 bg-white text-gray-700"
-      }`}
-    >
-      {r}
-    </button>
-  ))}
-</div>
+          <div className="grid grid-cols-2 gap-1 mt-2">
+            {["Admin", "RH", "Direction", "Lecture seule"].map((r) => (
+              <button
+                key={r}
+                type="button"
+                onClick={() => setRole(r)}
+                className={`rounded px-3 py-2 text-xs font-bold ${
+                  role === r
+                    ? "bg-[#0b234a] text-white"
+                    : "border border-gray-300 bg-white text-gray-700"
+                }`}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
 
-<p className="mt-2 text-xs text-gray-500">
-  Rôle sélectionné : <strong>{role}</strong>
-</p>
+          <p className="mt-2 text-xs text-gray-500">
+            Rôle sélectionné : <strong>{role}</strong>
+          </p>
         </div>
 
         <div className="mt-5">
           <label className="text-xs font-bold tracking-wider text-[#0b234a]">
             EMAIL PROFESSIONNEL
           </label>
+
           <div className="mt-2 bg-[#f0eef2] border border-gray-300 rounded h-12 flex items-center px-4 text-gray-500">
             ✉️
             <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="bg-transparent outline-none ml-2 text-sm w-full"
               placeholder="nom.prenom@eppm.com"
             />
@@ -74,6 +113,7 @@ export default function LoginPage() {
             <label className="text-xs font-bold tracking-wider text-[#0b234a]">
               MOT DE PASSE
             </label>
+
             <a className="text-xs text-[#6f6fa3] font-semibold" href="#">
               Mot de passe oublié ?
             </a>
@@ -83,6 +123,8 @@ export default function LoginPage() {
             🔒
             <input
               type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="bg-transparent outline-none ml-2 text-sm w-full"
               placeholder="••••••••"
             />
@@ -94,22 +136,29 @@ export default function LoginPage() {
           <span>Se souvenir de moi</span>
         </div>
 
-      <a
-  href="/dashboard"
-  className="block text-center w-full bg-[#0b234a] text-white font-bold text-lg rounded mt-4 py-3 shadow-md"
->
+        <button
+          type="button"
+          onClick={handleLogin}
+          disabled={!isFormValid}
+          className={`block text-center w-full text-white font-bold text-lg rounded mt-4 py-3 shadow-md ${
+            isFormValid
+              ? "bg-[#0b234a]"
+              : "bg-gray-400 cursor-not-allowed"
+          }`}
+        >
+          Se connecter
+        </button>
 
-  Se connecter
-</a>
-<p className="text-sm text-gray-600 mt-6 text-center">
-  Vous n'avez pas de compte ?{" "}
-  <a
-    href="/register"
-    className="text-[#0b234a] font-semibold hover:underline"
-  >
-    Créer un compte
-  </a>
-</p>
+        <p className="text-sm text-gray-600 mt-6 text-center">
+          Vous n'avez pas de compte ?{" "}
+          <Link
+            href="/register"
+            className="text-[#0b234a] font-semibold hover:underline"
+          >
+            Créer un compte
+          </Link>
+        </p>
+
         <div className="border-t border-gray-200 mt-7 pt-5 text-center">
           <p className="text-xs font-semibold text-gray-700">
             Besoin d'assistance ?{" "}

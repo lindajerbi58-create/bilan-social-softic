@@ -255,7 +255,7 @@ const exportPDF = () => {
 const menu = [
   { text: "Dashboard", href: "/Dashboard" },
   { text: "Employés", href: "/Employe" },
-  { text: "Profil", href: "/Profil" },
+  { text: "Profil", href: "/Profile" },
   { text: "Effectif", href: "/Effectif" },
   { text: "Rémunération", href: "/Remuneration" },
   { text: "Absences", href: "/Absences" },
