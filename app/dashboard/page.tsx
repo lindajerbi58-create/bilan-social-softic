@@ -252,26 +252,25 @@ const exportPDF = () => {
     criticalAlerts.push(`Turnover élevé : ${turnover}%`);
   }
 
-  const menu = [
-    "Dashboard",
-    "Employés",
-    "Profil",
-    "Effectif",
-    "Rémunération",
-    "Absences",
-    "Rendement",
-    "Recrutement",
-    "Formation",
-    "Accidents/HSE",
-    "Analyse",
-    "Comparaison",
-    "Rapports",
-    "Import",
-    "Audit",
-    "Paramètres",
-    "Aide",
-  ];
-
+const menu = [
+  { text: "Dashboard", href: "/Dashboard" },
+  { text: "Employés", href: "/Employe" },
+  { text: "Profil", href: "/Profil" },
+  { text: "Effectif", href: "/Effectif" },
+  { text: "Rémunération", href: "/Remuneration" },
+  { text: "Absences", href: "/Absences" },
+  { text: "Rendement", href: "/Rendement" },
+  { text: "Recrutement", href: "/Recrutement" },
+  { text: "Formation", href: "/Formation" },
+  { text: "Accidents/HSE", href: "/AccidentsHSE" },
+  { text: "Analyse", href: "/Analyse" },
+  { text: "Comparaison", href: "/Comparaison" },
+  { text: "Rapports", href: "/Rapports" },
+  { text: "Import", href: "/Import" },
+  { text: "Audit", href: "/Audit" },
+  { text: "Paramètres", href: "/Parametres" },
+  { text: "Aide", href: "/Aide" },
+];
   return (
     <main className="min-h-screen bg-[#f6f7fb] flex text-[#081326]">
       <aside className="w-64 bg-[#061125] text-white min-h-screen flex flex-col justify-between">
@@ -279,20 +278,15 @@ const exportPDF = () => {
           <h1 className="text-xl font-bold p-6">EPPM RH</h1>
 
           <nav className="mt-4">
-            {menu.map((item) => (
-              <div
-                key={item}
-                className={`px-6 py-3 text-sm flex items-center gap-3 ${
-                  item === "Dashboard"
-                    ? "bg-[#0d1d3a]"
-                    : "text-gray-300 hover:bg-[#0d1d3a]"
-                }`}
-              >
-                <span>▣</span>
-                {item}
-              </div>
-            ))}
-          </nav>
+  {menu.map((item) => (
+    <SidebarItem
+      key={item.text}
+      text={item.text}
+      href={item.href}
+      active={item.text === "Dashboard"}
+    />
+  ))}
+</nav>
         </div>
 
         <div className="p-6 flex items-center gap-3">
