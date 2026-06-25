@@ -1,7 +1,30 @@
 "use client";
-
+import Link from "next/link";
 import { useState } from "react";
 import * as XLSX from "xlsx";
+function SidebarItem({
+  text,
+  href,
+  active,
+}: {
+  text: string;
+  href: string;
+  active?: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      className={`px-5 py-3 text-sm flex items-center gap-3 cursor-pointer ${
+        active
+          ? "bg-[#111c33] text-white"
+          : "text-slate-300 hover:bg-[#111c33]"
+      }`}
+    >
+      <span className="w-3 h-3 border border-slate-300 rounded-sm" />
+      {text}
+    </Link>
+  );
+}
 export default function ImportPage() {
   const [type, setType] = useState("Employés");
   const [fileName, setFileName] = useState("");
@@ -51,37 +74,29 @@ setErrors([]);
 
   return (
     <main className="min-h-screen bg-[#f7f8fb] flex">
-      <aside className="w-64 bg-[#061125] text-white p-5">
-        <h1 className="font-bold text-lg mb-8">EPPM RH</h1>
-        {[
-          "Dashboard",
-          "Employés",
-          "Profil",
-          "Effectif",
-          "Rémunération",
-          "Absences",
-          "Rendement",
-          "Recrutement",
-          "Formation",
-          "Accidents/HSE",
-          "Analyse",
-          "Comparaison",
-          "Rapports",
-          "Import",
-          "Audit",
-          "Paramètres",
-          "Aide",
-        ].map((item) => (
-          <div
-            key={item}
-            className={`py-3 px-3 rounded text-sm ${
-              item === "Import" ? "bg-[#0b234a]" : "text-gray-300"
-            }`}
-          >
-            {item}
-          </div>
-        ))}
-      </aside>
+    <aside className="w-64 bg-[#061125] text-white min-h-screen">
+  <h1 className="font-bold text-lg p-6">EPPM RH</h1>
+
+  <nav className="mt-4">
+    <SidebarItem text="Dashboard" href="/dashboard" />
+    <SidebarItem text="Employés" href="/Employe" />
+    <SidebarItem text="Profil" href="/Profil" />
+    <SidebarItem text="Effectif" href="/Effectif" />
+    <SidebarItem text="Rémunération" href="/Remuneration" />
+    <SidebarItem text="Absences" href="/Absences" />
+    <SidebarItem text="Rendement" href="/Rendement" />
+    <SidebarItem text="Recrutement" href="/Recrutement" />
+    <SidebarItem text="Formation" href="/Formation" />
+    <SidebarItem text="Accidents/HSE" href="/AccidentsHSE" />
+    <SidebarItem text="Analyse" href="/Analyse" />
+    <SidebarItem text="Comparaison" href="/Comparaison" />
+    <SidebarItem text="Rapports" href="/Rapports" />
+    <SidebarItem text="Import" href="/import" active />
+    <SidebarItem text="Audit" href="/Audit" />
+    <SidebarItem text="Paramètres" href="/Parametres" />
+    <SidebarItem text="Aide" href="/Aide" />
+  </nav>
+</aside>
 
       <section className="flex-1">
         <header className="h-16 bg-white border-b flex justify-between items-center px-6">

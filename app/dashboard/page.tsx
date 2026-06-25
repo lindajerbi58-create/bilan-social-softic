@@ -266,7 +266,7 @@ const menu = [
   { text: "Analyse", href: "/Analyse" },
   { text: "Comparaison", href: "/Comparaison" },
   { text: "Rapports", href: "/Rapports" },
-  { text: "Import", href: "/Import" },
+  { text: "Import", href: "/import" },
   { text: "Audit", href: "/Audit" },
   { text: "Paramètres", href: "/Parametres" },
   { text: "Aide", href: "/Aide" },
